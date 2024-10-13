@@ -18,7 +18,7 @@ def Main():
 
 def MakeRegEx(inputText):
     regEx='.*'.join(inputText)
-    print(regEx)
+    #print(regEx)
     return regEx
 
 
