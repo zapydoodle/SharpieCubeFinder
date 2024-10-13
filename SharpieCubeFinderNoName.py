@@ -2,13 +2,13 @@ import requests
 import re
 
 def Main():
-    inputName=input("What are you looking for in the card's name? ")
-    inputName=inputName.replace(" ","")
-    regExName=MakeRegEx(inputName)
+    #inputName=input("What are you looking for in the card's name? ")
+    #inputName=inputName.replace(" ","")
+    #regExName=MakeRegEx(inputName)
     inputText=input("What are you looking for in the card's text? (rules and flavour text are combined) ")
     inputText=inputText.replace(" ","")
     regExText=MakeRegEx(inputText)
-    cards=GetCards(regExName,regExText)
+    cards=GetCards(regExText)
     file = open("output.txt","w")
     for card in cards:
         print(card['name'])
@@ -60,11 +60,11 @@ def FilterByCombinedText(cards, textRegex):
             matchedCards.append(card)
     return matchedCards
 
-def GetCards(regExName,regExText):
+def GetCards(regExText):
     url = "https://api.scryfall.com/cards/search?q=t:creature+OR+t:sorcery+OR+t:instant+OR+t:artifact+OR+t:land+OR+t:enchantment+OR+t:battle+OR+t:planeswalker"
     cards = FetchCards(url)
-    nameFilteredCards = FilterByName(cards, regExName)
-    finalMatchedCards = FilterByCombinedText(nameFilteredCards, regExText)
+    #finalMatchedCards = FilterByName(cards, regExText)
+    finalMatchedCards = FilterByCombinedText(cards, regExText)
     return finalMatchedCards
 
         
