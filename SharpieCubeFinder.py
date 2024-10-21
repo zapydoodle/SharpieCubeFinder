@@ -1,5 +1,7 @@
 import requests
 import re
+import os
+import json
 
 def Main():
     inputName=input("What are you looking for in the card's name? ")
@@ -10,9 +12,11 @@ def Main():
     regExText=MakeRegEx(inputText)
     cards=GetCards(regExName,regExText)
     file = open("output.txt","w")
+    print("List complete")
+    print("Writing to output.txt")
     for card in cards:
-        print(card['name'])
-        file.write(card['name'] + "\n")
+        #print(card['name'])
+        file.write(card['name'] + " " + card['set'] + "\n")
     file.close()
     
 
@@ -58,15 +62,40 @@ def FilterByCombinedText(cards, textRegex):
         combinedText = CombineText(card)
         if re.search(textRegex, combinedText, re.IGNORECASE):  # Case-insensitive search
             matchedCards.append(card)
+            print(card['name'] + " " + card['set'])
     return matchedCards
 
 def GetCards(regExName,regExText):
     url = "https://api.scryfall.com/cards/search?q=t:creature+OR+t:sorcery+OR+t:instant+OR+t:artifact+OR+t:land+OR+t:enchantment+OR+t:battle+OR+t:planeswalker"
-    cards = FetchCards(url)
+    #cards = FetchCards(url)
+    cards = GetLocalOrRemote(url)
+    print("Searching for cards")
     nameFilteredCards = FilterByName(cards, regExName)
     finalMatchedCards = FilterByCombinedText(nameFilteredCards, regExText)
     return finalMatchedCards
 
+def GetLocalOrRemote(url):
+    filepath= "cards.json"
+    if os.path.exists(filepath):
+        update=input("Would you like to update the local card database? (y/n) ")
+        if update == "y":
+            cards = FetchCards(url)
+            with open(filepath, "w") as json_file:
+                json.dump(cards, json_file)
+                print("Local database updated")
+        elif update == "n":
+            with open(filepath, "r") as json_file:
+                cards = json.load(json_file)
+    else:
+        createLocalDatabase=input("Would you like to create a local card database? (y/n) ")
+        if createLocalDatabase == "y":
+            cards = FetchCards(url)
+            with open(filepath, "w") as json_file:
+                json.dump(cards, json_file)
+                print("Local database created")
+        elif createLocalDatabase == "n":
+            cards = FetchCards(url)
+    return cards
         
 if __name__ == "__main__":
     Main()
